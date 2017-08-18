@@ -1,0 +1,32 @@
+{
+	"extends": [
+		"tslint:recommended",
+		"tslint-react"
+	],
+	"rules": {
+		"no-unused-expression": true,
+		"no-duplicate-variable": true,
+		"curly": true,
+		"class-name": true,
+		"semicolon": [
+			true,
+			"never"
+		],
+		"triple-equals": true,
+		"quotemark": [
+			"single"
+		],
+		"interface-name": [
+			"never-prefix"
+		],
+		"ordered-imports": [
+			false
+		],
+		"object-literal-sort-keys": [
+			false
+		],
+		"trailing-comma": [
+			false
+		]
+	}
+}
