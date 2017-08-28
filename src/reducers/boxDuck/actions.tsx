@@ -27,6 +27,10 @@ export const selectBox = actionCreator<{
     id: string,
 }>("SELECT_BOX")
 
+export const editBox = actionCreator<{
+    id: string,
+}>("EDIT_BOX")
+
 export const startDragBox = actionCreator<{
     id: string,
     cx: number,

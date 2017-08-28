@@ -15,6 +15,7 @@ export const boxById: ById<Box> = {}
 export const boxList: string[] = []
 
 export const selectedBox: string = ''
+export const editingBox: string = ''
 export const draggedBox: {
     id: string,
     cx: number,

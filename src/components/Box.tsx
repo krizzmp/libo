@@ -1,18 +1,19 @@
 import * as React from "react"
 import styled from 'styled-components'
 import { Editor, EditorState, ContentBlock } from 'draft-js'
+
 interface BoxProps {
-    x: number,
-    y: number,
-    editable: boolean,
-    dragging: boolean,
-    id: string,
-    selectBox: (id: string) => void,
-    startDrag: (id: string, cx: number, cy: number, x: number, y: number) => void,
-    editorState: EditorState,
-    onChange: (id: string, editorState: EditorState) => void,
-    onDrop(droppedId: string): void
-    onSize(id: string, w: number, h: number): void
+    id: string
+    x: number
+    y: number
+    editable: boolean
+    dragging: boolean
+    editorState: EditorState
+    editBox(obj: { id: string }): void
+    startDrag(obj: { id: string, cx: number, cy: number, x: number, y: number }): void
+    onChange(obj: { id: string, editorState: EditorState }): void
+    onDrop(obj: { droppedId: string }): void
+    onSize(obj: { id: string, w: number, h: number }): void
 }
 interface Bsp {
     x: number,
@@ -59,21 +60,7 @@ const HandleSpan = (props: { children: React.ReactChildren }) => {
         </span>
     )
 }
-function myBlockRenderer(contentBlock: ContentBlock) {
-    const text = contentBlock.getText()
-    if (text === '---') {
-        return {
-            component: HandleSpan,
-            editable: true,
-            type: 'hr',
-            props: {
-                foo: 'bar',
-            },
-        }
-    }
-    return null
-}
-export class BoxView extends React.Component<BoxProps> {
+export default class BoxView extends React.Component<BoxProps> {
     private r: Editor
     private bs: HTMLDivElement
     constructor(props: BoxProps, context?: any) {
@@ -87,8 +74,8 @@ export class BoxView extends React.Component<BoxProps> {
     }
     public componentDidMount() {
         const { width, height } = this.bs.getBoundingClientRect()
-        this.props.onSize(this.props.id, width, height)
-        this.props.selectBox(this.props.id)
+        this.props.onSize({ id: this.props.id, w: width, h: height })
+        this.props.editBox({ id: this.props.id })
     }
     public componentDidUpdate(prevProps: BoxProps) {
         if (prevProps.editable !== this.props.editable) {
@@ -114,46 +101,54 @@ export class BoxView extends React.Component<BoxProps> {
                     editorState={this.props.editorState}
                     onChange={this.onChange}
                     readOnly={!this.props.editable}
-                    blockRendererFn={myBlockRenderer}
+                    blockRendererFn={this.myBlockRenderer}
                     blockStyleFn={this.myBlockStyleFn}
                 />
             </BoxStyled>
         )
     }
     private onBlur() {
-        this.props.selectBox('')
+        this.props.editBox({ id: '' })
     }
     private setInnerRef(bs: HTMLDivElement) {
         this.bs = bs
     }
     private onMouseUp() {
-        this.props.onDrop(this.props.id)
+        this.props.onDrop({ droppedId: this.props.id })
     }
     private startEditing(e: React.MouseEvent<HTMLDivElement>) {
         e.preventDefault()
         e.stopPropagation()
-        this.props.selectBox(this.props.id)
+        this.props.editBox({ id: this.props.id })
     }
     private startDrag(e: React.MouseEvent<HTMLDivElement>) {
         e.preventDefault()
         const cx = e.clientX
         const cy = e.clientY
-        setTimeout(
-            () => {
-                if (!this.props.editable) {
-                    this.props.startDrag(this.props.id, cx, cy, this.props.x, this.props.y)
-                }
-            },
-            0
-        )
+        this.props.startDrag({ id: this.props.id, cx, cy, x: this.props.x, y: this.props.y })
+
     }
     private onChange(e: EditorState) {
         const { width, height } = this.bs.getBoundingClientRect()
-        this.props.onChange(this.props.id, e)
-        this.props.onSize(this.props.id, width, height)
+        this.props.onChange({ id: this.props.id, editorState: e })
+        this.props.onSize({ id: this.props.id, w: width, h: height })
     }
     private myBlockStyleFn(contentBlock: ContentBlock) {
         if (contentBlock.getText() === '---') { return 'hr' }
         return 'unstyled'
+    }
+    private myBlockRenderer(contentBlock: ContentBlock) {
+        const text = contentBlock.getText()
+        if (text === '---') {
+            return {
+                component: HandleSpan,
+                editable: true,
+                type: 'hr',
+                props: {
+                    foo: 'bar',
+                },
+            }
+        }
+        return null
     }
 }

@@ -1,6 +1,6 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
 import * as R from 'ramda'
-import { createBox, moveBox, updateSize, changeText, startDragBox, drop, selectBox } from './actions'
+import { createBox, moveBox, updateSize, changeText, startDragBox, drop, selectBox, editBox } from './actions'
 import * as initialState from './stateTypes'
 import { EditorState, ContentState } from 'draft-js'
 
@@ -9,9 +9,7 @@ export const boxById = reducerWithInitialState(initialState.boxById)
         {
             ...state,
             [payload.id]: {
-                ...payload,
-                w: 0,
-                h: 0,
+                ...payload, w: 0, h: 0,
                 editorState: EditorState.createWithContent(ContentState.createFromText(''))
             }
         }
@@ -33,6 +31,11 @@ export const boxList = reducerWithInitialState(initialState.boxList)
 
 export const selectedBox = reducerWithInitialState(initialState.selectedBox)
     .case(selectBox, (state, payload) =>
+        payload.id
+    )
+
+export const editingBox = reducerWithInitialState(initialState.editingBox)
+    .case(editBox, (state, payload) =>
         payload.id
     )
 

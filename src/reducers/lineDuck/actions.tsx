@@ -7,3 +7,6 @@ export const createLine = actionCreator<{
     from: string
     to: string
 }>("CREATE_LINE")
+
+export const toggleLineType = actionCreator<{
+}>("TOGGLE_LINE_TYPE")
