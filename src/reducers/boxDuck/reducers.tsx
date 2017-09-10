@@ -1,6 +1,9 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
 import * as R from 'ramda'
-import { createBox, moveBox, updateSize, changeText, startDragBox, drop, selectBox, editBox } from './actions'
+import {
+    createBox, createBoxUnder, moveBox, updateSize,
+    changeText, startDragBox, drop, selectBox, editBox
+} from './actions'
 import * as initialState from './stateTypes'
 import { EditorState, ContentState } from 'draft-js'
 
@@ -14,6 +17,22 @@ export const boxById = reducerWithInitialState(initialState.boxById)
             }
         }
     ))
+    .case(createBoxUnder, (state, payload) => {
+        const margin = 8
+        const box = state[payload.boxOverId]
+        const x = box.x
+        const y = box.y + box.h + margin
+        return {
+            ...state,
+            [payload.id]: {
+                id: payload.id,
+                x,
+                y,
+                w: 0, h: 0,
+                editorState: EditorState.createWithContent(ContentState.createFromText(''))
+            }
+        }
+    })
     .case(moveBox, (state, { id, x, y }) =>
         R.mergeDeepLeft({ [id]: { x, y } }, state)
     )
@@ -26,6 +45,9 @@ export const boxById = reducerWithInitialState(initialState.boxById)
 
 export const boxList = reducerWithInitialState(initialState.boxList)
     .case(createBox, (state, payload) =>
+        [...state, payload.id]
+    )
+    .case(createBoxUnder, (state, payload) =>
         [...state, payload.id]
     )
 

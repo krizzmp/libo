@@ -8,6 +8,10 @@ export const createBox = actionCreator<{
     x: number,
     y: number,
 }>("CREATE_BOX")
+export const createBoxUnder = actionCreator<{
+    id: string,
+    boxOverId: string,
+}>("CREATE_BOX_UNDER")
 export const moveBox = actionCreator<{
     id: string
     x: number

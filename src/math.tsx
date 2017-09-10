@@ -46,3 +46,21 @@ export function getSide(rect: Rect, p1: Point, p2: Point) {
         nw: tf ? "w" : "n"
     }[dir]
 }
+import { stateTypes } from './reducers/index'
+type RootState = typeof stateTypes
+type Box = RootState['boxById'][string]
+const getRect = (box: Box) => ({
+    nw: { x: box.x, y: box.y },
+    ne: { x: box.x + box.w, y: box.y },
+    sw: { x: box.x, y: box.y + box.h },
+    se: { x: box.x + box.w, y: box.y + box.h }
+})
+const getCenter = (box: Box) => ({
+    x: box.x + (box.w / 2),
+    y: box.y + (box.h / 2)
+})
+export const getSideFromBox = (box: Box, other: Box) => getSide(
+    getRect(box),
+    getCenter(box),
+    getCenter(other)
+)

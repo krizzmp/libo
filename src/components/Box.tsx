@@ -1,7 +1,7 @@
 import * as React from "react"
 import styled from 'styled-components'
 import { Editor, EditorState, ContentBlock } from 'draft-js'
-
+import * as cuid from 'cuid'
 interface BoxProps {
     id: string
     x: number
@@ -14,6 +14,7 @@ interface BoxProps {
     onChange(obj: { id: string, editorState: EditorState }): void
     onDrop(obj: { droppedId: string }): void
     onSize(obj: { id: string, w: number, h: number }): void
+    onShiftEnter(obj: { id: string, boxOverId: string }): void
 }
 interface Bsp {
     x: number,
@@ -71,6 +72,7 @@ export default class BoxView extends React.Component<BoxProps> {
         this.onBlur = this.onBlur.bind(this)
         this.onMouseUp = this.onMouseUp.bind(this)
         this.setInnerRef = this.setInnerRef.bind(this)
+        this.onEnter = this.onEnter.bind(this)
     }
     public componentDidMount() {
         const { width, height } = this.bs.getBoundingClientRect()
@@ -100,6 +102,7 @@ export default class BoxView extends React.Component<BoxProps> {
                     onBlur={this.onBlur}
                     editorState={this.props.editorState}
                     onChange={this.onChange}
+                    handleReturn={this.onEnter}
                     readOnly={!this.props.editable}
                     blockRendererFn={this.myBlockRenderer}
                     blockStyleFn={this.myBlockStyleFn}
@@ -115,6 +118,13 @@ export default class BoxView extends React.Component<BoxProps> {
     }
     private onMouseUp() {
         this.props.onDrop({ droppedId: this.props.id })
+    }
+    private onEnter(e: React.KeyboardEvent<{}>): Draft.DraftHandleValue {
+        if (e.shiftKey) {
+            this.props.onShiftEnter({ id: cuid(), boxOverId: this.props.id })
+            return 'handled'
+        }
+        return 'not-handled'
     }
     private startEditing(e: React.MouseEvent<HTMLDivElement>) {
         e.preventDefault()

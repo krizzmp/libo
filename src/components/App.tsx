@@ -71,6 +71,7 @@ class App extends React.Component<AppProps> {
                 onChange={this.props.changeText}
                 onDrop={this.onDrop}
                 onSize={this.props.updateSize}
+                onShiftEnter={this.props.createBoxUnder}
             />
         )
     }
